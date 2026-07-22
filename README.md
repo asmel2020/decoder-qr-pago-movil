@@ -16,6 +16,8 @@ Monorepo del paquete `decoder-qr-pago-movil`.
 
 ## Desarrollo
 
+Todos los comandos se ejecutan desde la **raíz del proyecto**, salvo que se indique lo contrario.
+
 ```bash
 bun install
 ```
@@ -44,10 +46,14 @@ Genera en `packages/decoder-qr-pago-movil/dist/`:
 Solo en la rama principal, después de mergear un PR:
 
 ```bash
-# 1. Actualizar versión y crear tag
-npm version patch   # o minor / major
+# 1. Moverse al directorio del paquete
+cd packages/decoder-qr-pago-movil
 
-# 2. Subir commit + tag
+# 2. Actualizar versión y crear tag (patch / minor / major)
+npm version patch
+
+# 3. Volver a la raíz y subir commit + tag
+cd ../..
 git push --follow-tags
 ```
 
