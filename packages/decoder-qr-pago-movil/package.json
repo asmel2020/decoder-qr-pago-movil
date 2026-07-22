@@ -1,6 +1,6 @@
 {
   "name": "decoder-qr-pago-movil",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Decodifica códigos QR de Pago Móvil (Suiche 7B). Compatible con 58 bancos. Funciona en Node.js, Bun y navegador.",
   "license": "MIT",
   "type": "module",
@@ -15,7 +15,9 @@
       "require": "./dist/decoder-qr-pago-movil.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prebuild": "bun run scripts/prebuild.ts",
     "build": "bun run prebuild && bun run build:esm && bun run build:cjs && bun run build:browser && bun run build:types",
