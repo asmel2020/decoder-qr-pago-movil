@@ -10,9 +10,18 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/decoder-qr-pago-movil.browser.js",
-      "import": "./dist/decoder-qr-pago-movil.js",
-      "require": "./dist/decoder-qr-pago-movil.cjs"
+      "browser": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/decoder-qr-pago-movil.browser.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/decoder-qr-pago-movil.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/decoder-qr-pago-movil.cjs"
+      }
     }
   },
   "files": [
