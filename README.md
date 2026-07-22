@@ -15,7 +15,7 @@ Los QR de Suiche 7B contienen datos cifrados en Base64 con parámetros en la URL
 
 El paquete:
 
-1. **Desofusca** las claves AES/RSA embebidas en el APK del banco (58 bancos)
+1. **Deriva** las claves AES/RSA embebidas en el estándar (58 bancos compatibles)
 2. **Decide algoritmo**: si `origin=web` usa RSA, si no usa AES-256-CBC
 3. **Descifra** el payload y retorna `{ dni, phone, bank, name }`
 
@@ -71,7 +71,7 @@ const result = decoder.decode(payload)
 
 ### `createDecoderFromStrings(strings)`
 
-Solo Node/Bun. Construye el decodificador desde los strings ofuscados originales del APK:
+Solo Node/Bun. Construye el decodificador desde los strings ofuscados originales:
 
 ```ts
 import { createDecoderFromStrings } from 'decoder-qr-pago-movil'
