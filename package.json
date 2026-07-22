@@ -1,0 +1,21 @@
+{
+  "name": "qr-pago-movil-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "packageManager": "bun@1.3.14",
+  "scripts": {
+    "build": "turbo run build",
+    "build:lib": "turbo run build --filter=decoder-qr-pago-movil",
+    "dev": "turbo run dev",
+    "dev:react": "turbo run dev --filter=test-react",
+    "dev:next": "turbo run dev --filter=test-next",
+    "clean": "turbo run clean",
+    "prebuild": "turbo run prebuild"
+  },
+  "devDependencies": {
+    "turbo": "^2"
+  }
+}
