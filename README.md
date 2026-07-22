@@ -1,101 +1,56 @@
 # decoder-qr-pago-movil
 
-Decodifica los códigos QR del estándar **Suiche 7B** (Pago Móvil Interbancario) y extrae los datos del beneficiario: **dni, phone, bank, name**.
+Monorepo del paquete `decoder-qr-pago-movil`.
 
-Funciona en **Node.js**, **Bun**, y **navegador** (React, Next.js, Vite).
-
-## Cómo funciona
-
-Los QR de Suiche 7B contienen datos cifrados en Base64 con parámetros en la URL:
+## Estructura
 
 ```
-<base64>?merchantId=0114&strong_id=1784217050
-<base64>?merchantId=0174&strong_id=1784728017&origin=web
+├── apps/
+│   ├── test-next/          # App Next.js de prueba
+│   └── test-react/         # App React/Vite de prueba
+├── packages/
+│   └── decoder-qr-pago-movil/   # El paquete npm
+└── .github/workflows/
+    └── publish.yml         # CI para publicar a npm
 ```
 
-El paquete:
-
-1. **Deriva** las claves AES/RSA embebidas en el estándar (58 bancos compatibles)
-2. **Decide algoritmo**: si `origin=web` usa RSA, si no usa AES-256-CBC
-3. **Descifra** el payload y retorna `{ dni, phone, bank, name }`
-
-## Instalación
+## Desarrollo
 
 ```bash
-bun add decoder-qr-pago-movil
-# o
-npm install decoder-qr-pago-movil
+bun install
 ```
 
-## Uso básico
+### Apps de prueba
 
-```ts
-import { decodeQr } from 'decoder-qr-pago-movil'
-
-const payload = '9fbRuC0tEp6n0rkkRa2TgAF5...?merchantId=0114&strong_id=1784217050'
-
-const result = decodeQr(payload)
-// {
-//   dni:   'V18776649',
-//   phone: '584263833791',
-//   bank:  '0114',
-//   name:  'Pinedas Velasquez Yesenia Del'
-// }
+```bash
+bun run dev:next    # Next.js
+bun run dev:react   # React + Vite
 ```
 
-## API
+### Build del paquete
 
-### `decodeQr(payload: string): QrData`
-
-Parsea y descifra el QR. Retorna:
-
-| Campo   | Tipo     | Ejemplo             |
-|---------|----------|----------------------|
-| `dni`   | `string` | `V18776649`          |
-| `phone` | `string` | `584263833791`       |
-| `bank`  | `string` | `0114`               |
-| `name`  | `string` | `Pinedas Velasquez Yesenia Del` |
-
-> El campo `id` del JSON original se mapea a `dni` y se le antepone `V` si no lo trae.
-
-### `QrDecoder` (clase)
-
-Para crear múltiples decodificadores o inyectar claves manualmente:
-
-```ts
-import { QrDecoder } from 'decoder-qr-pago-movil'
-
-const decoder = new QrDecoder({ aesKeys, rsaKeys })
-const result = decoder.decode(payload)
+```bash
+bun run build:lib
 ```
 
-### `createDecoderFromStrings(strings)`
+Genera en `packages/decoder-qr-pago-movil/dist/`:
+- `decoder-qr-pago-movil.js` (ESM Node/Bun)
+- `decoder-qr-pago-movil.cjs` (CJS Node)
+- `decoder-qr-pago-movil.browser.js` (ESM browser)
+- `index.d.ts` + tipos (TypeScript)
 
-Solo Node/Bun. Construye el decodificador desde los strings ofuscados originales:
+## Publicar a npm
 
-```ts
-import { createDecoderFromStrings } from 'decoder-qr-pago-movil'
-import keysData from './keys.json'
+Solo en la rama principal, después de mergear un PR:
 
-const decoder = createDecoderFromStrings(keysData.strings)
+```bash
+# 1. Actualizar versión y crear tag
+npm version patch   # o minor / major
+
+# 2. Subir commit + tag
+git push --follow-tags
 ```
 
-## Formatos de distribución
+GitHub Actions publica automáticamente al detectar el tag `v*`.
 
-| Archivo | Formato | Target |
-|---------|---------|--------|
-| `dist/decoder-qr-pago-movil.js` | ESM | Node.js / Bun |
-| `dist/decoder-qr-pago-movil.cjs` | CJS | Node.js |
-| `dist/decoder-qr-pago-movil.browser.js` | ESM | Navegador / Vite / Next.js |
-
-## Características
-
-- ✅ 58 bancos compatibles
-- ✅ AES-256-CBC + RSA PKCS1 v1.5
-- ✅ Sin dependencias nativas (usa `node-forge`)
-- ✅ Funciona en cliente (browser) sin bundlers especiales
-- ✅ Las claves vienen pre-procesadas (no necesita Blowfish en runtime)
-
-## Licencia
-
-MIT
+Requiere el secret `NPM_TOKEN` configurado en el repo.
