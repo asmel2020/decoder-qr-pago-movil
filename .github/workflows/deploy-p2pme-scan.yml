@@ -1,0 +1,41 @@
+name: Deploy test-react to Cloudflare Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "apps/test-react/**"
+      - "packages/decoder-qr-pago-movil/**"
+      - ".github/workflows/deploy-p2pme-scan.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build
+        working-directory: apps/test-react
+        run: bun run build
+
+      - name: Install Wrangler
+        run: npm install -g wrangler@4
+
+      - name: Ensure Pages project exists
+        run: |
+          npx wrangler pages project create decode-pago-movil --production-branch master || echo "Project already exists"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/test-react/dist --project-name=decode-pago-movil

@@ -1,0 +1,309 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100dvh;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+.dropzone {
+  position: relative;
+  border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 24px;
+}
+
+.dropzone:hover,
+.dropzone.dragging {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.08);
+}
+
+.dropzone.dragging {
+  border-color: #764ba2;
+  background: rgba(118, 75, 162, 0.12);
+}
+
+.dropzone-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.dropzone-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+}
+
+.dropzone-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 8px;
+}
+
+.file-input {
+  display: none;
+}
+
+.preview-section {
+  margin-bottom: 24px;
+}
+
+.preview-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.3);
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+}
+
+.spinner::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #fca5a5;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.result-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.result-header-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.result-header-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.result-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.result-field:last-child {
+  border-bottom: none;
+}
+
+.result-field-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.result-field-value {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.raw-section {
+  margin-top: 24px;
+}
+
+.raw-header {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.raw-text {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 12px;
+  word-break: break-all;
+  line-height: 1.6;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: rgba(255,255,255,0.2);
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+
+.paste-area {
+  margin-bottom: 24px;
+}
+
+.paste-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.paste-input {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px;
+  color: #fff;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.paste-input:focus {
+  border-color: #667eea;
+}
+
+.paste-input::placeholder {
+  color: rgba(255,255,255,0.25);
+}
+
+.paste-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.paste-button:hover {
+  opacity: 0.9;
+}
+
+.paste-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 32px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+}

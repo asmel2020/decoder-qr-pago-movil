@@ -1,50 +1,254 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import jsQR from 'jsqr'
 import { decodeQr } from 'decoder-qr-pago-movil'
+import './App.css'
 
-const PAYLOADS = [
-  { label: 'QR #1 - AES 0114', value: '9fbRuC0tEp6n0rkkRa2TgAH55doZlBgAK1V9MWslgy5pCNLpLLQybP50FiM/5Dqta9hjUAC1LUyTsR/F4+pCpz1gUleC890g2o4E/V/RU8ztkNOxtspdVBRMt5poi4lYNefnkpkz6udpDD66oRR2DRwFzIpMcrWt9Lb5IVDyL1BtJtJd3WvZH0J0LsJGX7O86rIpQyj/X0txKu6GyKH8WA==?merchantId=0114&strong_id=1784217050' },
-  { label: 'QR #2 - RSA 0174', value: 'gB88aL3CUERepSTW53QXcYVDP8wpjOm4gR37ktHh854bWeBE3gb/AGjf0JtOYHeRswp62Du2pLRoVw9HiyfUBXrvERIiVaXPsrNXf7+K4uHRW+lFoZbrPhyewkM22hZRztQcd8WvfCe6+pXIvcc4W4Apzw8Llo2D47Hu8fhNPJQvx/lLU4ieUV6ocESXox7oe5blQwxfDj39WJUwkme1tnB34/elsXYaDWzhMONboLsKfDuJjHBR29HYWvAK+ybSMk2DqO4YyyMg4FZNzLSKfs+xgRMPwRgjeWfl+y5QTKAWgutFpzQkmC40mmLBkq+BQwnV0RFtPNm6EuNm9X+Ulw==?merchantId=0174&strong_id=1784728017&origin=web' },
-  { label: 'QR #3 - AES 0191', value: '0qulBU0rBIKWt0pNRTm4thyvFWWkIE/7Uq+Jl+lw4WkLGfFCqAUzjvJqV/fUePYnRpeWmsJVXvvO9CjAka/mzlss2DwZIUoPfM6mkMZ/XhqUKZIjIv/68NAT864eghUXVn7sLYGvTfSJg23awA54zwe4obqRn2bGA+zdU//OFO/B8eyHlhaWOrT2i+8ellTuXp4OIhZNivNu35YuGNVanA==?merchantId=0191&strong_id=1784754275' },
-  { label: 'QR #4 - RSA 0105', value: 'm28tuwbizhMer7LqTrXDR390LJYTLTMLxvAojSnPrZ2ese+vGGypN/1IfjBJVQyduC5qN+Hvyqa8FzYoP1xntmkI7PU6HlnAEpYgEZ1TSahnec0Ctt1Tpg3gK3rTG0ay5ST8h24YHsc6Q4aZtmxdLjtKyeChlbRhqq6v8e9qNlrpc/2nZ6HV0a1mcIOz7qm4GgpPQMaHW5ywzkuWE0ps9fMB9kCiyGPNj6G0SZomROybsNlMDevCMdpbGyz5w84MxNdomJwEgy8qhBYgKSEPlCn/cCmAdeZCtyFypu6Tr1tDgrlL0kLNRrv2CQKkLw3uHx8zxZohwuu3Cau0io4elA==?merchantId=0105&strong_id=260722171116&origin=web' },
-]
+type Status = 'idle' | 'scanning' | 'success' | 'error'
 
 function App() {
-  const [results, setResults] = useState<Record<number, any>>({})
-  const [loading, setLoading] = useState<Record<number, boolean>>({})
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [status, setStatus] = useState<Status>('idle')
+  const [result, setResult] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [raw, setRaw] = useState<string | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const [payloadText, setPayloadText] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const decode = (i: number) => {
-    setLoading(p => ({ ...p, [i]: true }))
-    setResults(p => ({ ...p, [i]: undefined }))
+  const decodePayload = useCallback((text: string) => {
+    setRaw(text)
+    setStatus('scanning')
+    setResult(null)
+    setError(null)
     try {
-      const r = decodeQr(PAYLOADS[i].value)
-      setResults(p => ({ ...p, [i]: r }))
+      const decoded = decodeQr(text.trim())
+      setResult(decoded)
+      setStatus('success')
     } catch (e: any) {
-      setResults(p => ({ ...p, [i]: { error: e.message } }))
+      setStatus('error')
+      setError(`Error al decodificar: ${e.message}`)
     }
-    setLoading(p => ({ ...p, [i]: false }))
+  }, [])
+
+  const processFile = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setStatus('error')
+      setError('El archivo seleccionado no es una imagen.')
+      return
+    }
+
+    const url = URL.createObjectURL(file)
+    setImageUrl(url)
+    setStatus('scanning')
+    setResult(null)
+    setError(null)
+    setRaw(null)
+
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, 1024 / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, w, h)
+
+      const imageData = ctx.getImageData(0, 0, w, h)
+      const code = jsQR(imageData.data, w, h)
+
+      if (!code) {
+        setStatus('error')
+        setError('No se detectó ningún código QR en la imagen. Asegúrate de que el QR sea visible y tenga buena iluminación.')
+        return
+      }
+
+      setRaw(code.data)
+      try {
+        const decoded = decodeQr(code.data)
+        setResult(decoded)
+        setStatus('success')
+      } catch (e: any) {
+        setStatus('error')
+        setError(`Error al decodificar: ${e.message}`)
+      }
+
+      URL.revokeObjectURL(url)
+    }
+    img.onerror = () => {
+      setStatus('error')
+      setError('No se pudo cargar la imagen.')
+      URL.revokeObjectURL(url)
+    }
+    img.src = url
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) processFile(file)
+  }, [processFile])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback(() => setDragging(false), [])
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
+  }, [processFile])
+
+  const handleClick = () => inputRef.current?.click()
+
+  const handleReset = () => {
+    setImageUrl(null)
+    setStatus('idle')
+    setResult(null)
+    setError(null)
+    setRaw(null)
+    setPayloadText('')
+    if (inputRef.current) inputRef.current.value = ''
   }
 
+  const cleanDni = (v: string) => v?.replace(/^V/i, '')
+  const cleanPhone = (v: string) => v?.replace(/^58/, '0')
+
+  const fields = result
+    ? [
+        { label: 'DNI', value: cleanDni(result.dni) },
+        { label: 'Teléfono', value: cleanPhone(result.phone) },
+        { label: 'Banco', value: result.bank },
+        { label: 'Titular', value: result.name },
+      ]
+    : []
+
   return (
-    <div style={{ padding: 24, fontFamily: 'monospace', maxWidth: 600, margin: '0 auto' }}>
-      <h1>BNC QR Decoder</h1>
-      <p>Test en React + Vite</p>
-      {PAYLOADS.map((p, i) => (
-        <div key={i} style={{ marginBottom: 16, border: '1px solid #ccc', padding: 12, borderRadius: 8 }}>
-          <strong>{p.label}</strong>
-          <button onClick={() => decode(i)} disabled={loading[i]} style={{ marginLeft: 12 }}>
-            {loading[i] ? '...' : 'Decodificar'}
-          </button>
-          {results[i] && !results[i].error && (
-            <div style={{ marginTop: 8, background: '#f0f0f0', padding: 8, borderRadius: 4 }}>
-              <div>dni: <b>{results[i].dni}</b></div>
-              <div>phone: <b>{results[i].phone}</b></div>
-              <div>bank: <b>{results[i].bank}</b></div>
-              <div>name: <b>{results[i].name}</b></div>
+    <div className="app">
+      <header className="header">
+        <h1>QR Pago Móvil</h1>
+        <p>Decodifica códigos QR de pago móvil venezolano</p>
+      </header>
+
+      {status === 'idle' && (
+        <>
+          <div
+            className={`dropzone${dragging ? ' dragging' : ''}`}
+            onClick={handleClick}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <div className="dropzone-icon">⬡</div>
+            <div className="dropzone-text">
+              {dragging ? 'Suelta la imagen aquí' : 'Toca para seleccionar o arrastra una imagen'}
+            </div>
+            <div className="dropzone-hint">PNG, JPG, WebP — hasta 10 MB</div>
+            <input ref={inputRef} type="file" className="file-input" accept="image/*" onChange={handleChange} />
+          </div>
+
+          <div className="divider">O pega el payload manualmente</div>
+
+          <div className="paste-area">
+            <div className="paste-label">Payload del QR</div>
+            <textarea
+              className="paste-input"
+              placeholder="Pega aquí el contenido del código QR…"
+              value={payloadText}
+              onChange={e => setPayloadText(e.target.value)}
+            />
+            <button
+              className="paste-button"
+              disabled={!payloadText.trim()}
+              onClick={() => decodePayload(payloadText)}
+            >
+              Decodificar payload
+            </button>
+          </div>
+
+          <div className="result-card" style={{ opacity: 0.5 }}>
+            <div className="result-header">
+              <div className="result-header-icon">?</div>
+              <div className="result-header-title">Esperando imagen</div>
+            </div>
+            {['DNI', 'Teléfono', 'Banco', 'Titular'].map(label => (
+              <div className="result-field" key={label}>
+                <span className="result-field-label">{label}</span>
+                <span className="result-field-value" style={{ color: 'rgba(255,255,255,0.2)' }}>—</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {imageUrl && (status === 'scanning') && (
+        <div className="preview-section">
+          <img src={imageUrl} alt="Preview" className="preview-image" />
+          <div className="spinner">Escaneando código QR…</div>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <>
+          {imageUrl && (
+            <div className="preview-section">
+              <img src={imageUrl} alt="Preview" className="preview-image" />
             </div>
           )}
-          {results[i]?.error && <div style={{ marginTop: 8, color: 'red' }}>Error: {results[i].error}</div>}
-        </div>
-      ))}
+          <div className="error-card">{error}</div>
+          <button onClick={handleReset} className="dropzone" style={{ padding: '16px 24px', borderStyle: 'solid', cursor: 'pointer' }}>
+            <div className="dropzone-text">Intentar de nuevo</div>
+          </button>
+        </>
+      )}
+
+      {status === 'success' && result && (
+        <>
+          {imageUrl && (
+            <div className="preview-section">
+              <img src={imageUrl} alt="Preview" className="preview-image" />
+            </div>
+          )}
+          <div className="result-card">
+            <div className="result-header">
+              <div className="result-header-icon">✓</div>
+              <div className="result-header-title">Decodificado correctamente</div>
+            </div>
+            {fields.map(f => (
+              <div className="result-field" key={f.label}>
+                <span className="result-field-label">{f.label}</span>
+                <span className="result-field-value">{f.value}</span>
+              </div>
+            ))}
+          </div>
+          {raw && (
+            <div className="raw-section">
+              <div className="raw-header">Contenido crudo del QR</div>
+              <div className="raw-text">{raw}</div>
+            </div>
+          )}
+          <button
+            className="paste-button"
+            style={{ marginTop: 16 }}
+            onClick={() => {
+              const text = fields.map(f => `${f.label}: ${f.value}`).join('\n')
+              navigator.clipboard.writeText(text)
+            }}
+          >
+            Copiar todo
+          </button>
+          <button onClick={handleReset} className="dropzone" style={{ marginTop: 24, padding: '16px 24px', borderStyle: 'solid', cursor: 'pointer' }}>
+            <div className="dropzone-text">Escanear otro QR</div>
+          </button>
+        </>
+      )}
+
+      <div className="footer">BNC QR Pago Móvil Decoder</div>
     </div>
   )
 }

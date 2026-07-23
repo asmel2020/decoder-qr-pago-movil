@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "decoder-qr-pago-movil": "workspace:*",
+    "jsqr": "^1.4.0",
     "react": "^19",
     "react-dom": "^19"
   },
