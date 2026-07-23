@@ -15,16 +15,17 @@ npm install decoder-qr-pago-movil
 ## Uso rápido
 
 ```ts
-import { decodeQr } from 'decoder-qr-pago-movil'
+import { decodeQr } from "decoder-qr-pago-movil";
 
-const payload = '9fbRuC0tEp6n0rkkRa2TgAF5...?merchantId=0114&strong_id=1784217050'
+const payload =
+  "9fbRuC0tEp6n0rkkRa2TgAF5...?merchantId=0114&strong_id=1784217050";
 
-const result = decodeQr(payload)
+const result = decodeQr(payload);
 // {
-//   dni:   'V18776649',
-//   phone: '584263833791',
+//   dni:   'V00000000',
+//   phone: '584260000000',
 //   bank:  '0114',
-//   name:  'Pinedas Velasquez Yesenia Del'
+//   name:  'Marco Aurelio'
 // }
 ```
 
@@ -34,12 +35,12 @@ const result = decodeQr(payload)
 
 Parsea y descifra el QR. Retorna:
 
-| Campo   | Tipo     | Ejemplo             |
-|---------|----------|----------------------|
-| `dni`   | `string` | `V18776649`          |
-| `phone` | `string` | `584263833791`       |
-| `bank`  | `string` | `0114`               |
-| `name`  | `string` | `Pinedas Velasquez Yesenia Del` |
+| Campo   | Tipo     | Ejemplo         |
+| ------- | -------- | --------------- |
+| `dni`   | `string` | `V00000000`     |
+| `phone` | `string` | `584260000000`  |
+| `bank`  | `string` | `0114`          |
+| `name`  | `string` | `Marco Aurelio` |
 
 > El campo `id` del JSON original se mapea a `dni` y se le antepone `V` si no lo trae.
 
@@ -48,19 +49,19 @@ Parsea y descifra el QR. Retorna:
 Para crear múltiples decodificadores o inyectar claves manualmente:
 
 ```ts
-import { QrDecoder } from 'decoder-qr-pago-movil'
+import { QrDecoder } from "decoder-qr-pago-movil";
 
-const decoder = new QrDecoder({ aesKeys, rsaKeys })
-const result = decoder.decode(payload)
+const decoder = new QrDecoder({ aesKeys, rsaKeys });
+const result = decoder.decode(payload);
 ```
 
 ## Formatos
 
-| Archivo | Formato | Target |
-|---------|---------|--------|
-| `dist/decoder-qr-pago-movil.js` | ESM | Node.js / Bun |
-| `dist/decoder-qr-pago-movil.cjs` | CJS | Node.js |
-| `dist/decoder-qr-pago-movil.browser.js` | ESM | Navegador / Vite / Next.js |
+| Archivo                                 | Formato | Target                     |
+| --------------------------------------- | ------- | -------------------------- |
+| `dist/decoder-qr-pago-movil.js`         | ESM     | Node.js / Bun              |
+| `dist/decoder-qr-pago-movil.cjs`        | CJS     | Node.js                    |
+| `dist/decoder-qr-pago-movil.browser.js` | ESM     | Navegador / Vite / Next.js |
 
 ## Características
 
