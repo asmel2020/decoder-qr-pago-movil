@@ -170,6 +170,25 @@ body {
 .result-header-title {
   font-size: 15px;
   font-weight: 600;
+  flex: 1;
+}
+
+.result-header-copy {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.result-header-copy:hover {
+  background: rgba(255,255,255,0.12);
 }
 
 .result-field {

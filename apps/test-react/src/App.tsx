@@ -218,6 +218,16 @@ function App() {
             <div className="result-header">
               <div className="result-header-icon">✓</div>
               <div className="result-header-title">Decodificado correctamente</div>
+              <button
+                className="result-header-copy"
+                onClick={() => {
+                  const text = [cleanDni(result.dni), cleanPhone(result.phone), result.bank].join('\n')
+                  navigator.clipboard.writeText(text)
+                }}
+                title="Copiar datos"
+              >
+                📋
+              </button>
             </div>
             {fields.map(f => (
               <div className="result-field" key={f.label}>
@@ -232,16 +242,6 @@ function App() {
               <div className="raw-text">{raw}</div>
             </div>
           )}
-          <button
-            className="paste-button"
-            style={{ marginTop: 16 }}
-            onClick={() => {
-              const text = fields.map(f => `${f.label}: ${f.value}`).join('\n')
-              navigator.clipboard.writeText(text)
-            }}
-          >
-            Copiar todo
-          </button>
           <button onClick={handleReset} className="dropzone" style={{ marginTop: 24, padding: '16px 24px', borderStyle: 'solid', cursor: 'pointer' }}>
             <div className="dropzone-text">Escanear otro QR</div>
           </button>
