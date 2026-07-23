@@ -19,7 +19,13 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Build
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build decoder package
+        run: bun run build:lib
+
+      - name: Build app
         working-directory: apps/test-react
         run: bun run build
 

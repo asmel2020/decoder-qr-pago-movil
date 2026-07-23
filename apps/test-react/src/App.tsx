@@ -248,7 +248,11 @@ function App() {
         </>
       )}
 
-      <div className="footer">BNC QR Pago Móvil Decoder</div>
+      <div className="footer">
+        <a href="https://github.com/asmel2020/decoder-qr-pago-movil" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+          BNC QR Pago Móvil Decoder — Open Source
+        </a>
+      </div>
     </div>
   )
 }
