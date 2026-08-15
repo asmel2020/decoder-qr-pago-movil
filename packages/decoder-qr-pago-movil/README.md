@@ -38,9 +38,10 @@ import { encodeQr } from "decoder-qr-pago-movil";
 
 const payload = encodeQr({
   dni: "12345678",
-  prefix: "V", // opcional, por defecto "V" (válidos: V, J, G)
+  prefix: "V", // opcional, por defecto "V" (válidos: V, J, G, E)
   phone: "584120000000",
   bank: "0114",
+  name: "Pago de prueba",
   amount: "150,00",
 });
 
@@ -63,7 +64,7 @@ Parsea y descifra el QR. Retorna:
 | `description` | `string` (opcional) | `Pago alquiler` |
 | `bdv`         | `string` (opcional) | `1234567890123456` |
 
-> El campo `id` del JSON original se mapea a `dni` y conserva su prefijo de letra (V, J, G); si no trae prefijo se le antepone `V` por defecto.
+> El campo `id` del JSON original se mapea a `dni` y conserva su prefijo de letra (V, J, G, E); si no trae prefijo se le antepone `V` por defecto.
 > El campo `description` no es aceptado por todos los bancos. Verifica con tu entidad antes de usarlo.
 
 ### `encodeQr(data: QrData): string`
@@ -81,7 +82,7 @@ Genera un payload QR codificado con AES-256-CBC. `bank` es el código del mercha
 | `description` | string  | No          |
 | `bdv`         | string  | No          |
 
-> El `dni` debe contener solo dígitos. El `prefix` es opcional y por defecto es `"V"`; solo se admiten `"V"`, `"J"` y `"G"` (se normaliza a mayúscula). Si pasas un prefijo no admitido lanza error.
+> El `dni` debe contener solo dígitos. El `prefix` es opcional y por defecto es `"V"`; solo se admiten `"V"`, `"J"`, `"G"` y `"E"` (se normaliza a mayúscula). Si pasas un prefijo no admitido lanza error.
 > El `amount` se valida y auto-corrige automáticamente: `150` → `150,00`, `150.5` → `150,50`, `150.00` → `150,00`.
 > El campo `description` no es aceptado por todos los bancos. Verifica con tu entidad antes de usarlo.
 

@@ -6,7 +6,7 @@ import QRCode from "qrcode";
 import { encodeQr, bankList } from "decoder-qr-pago-movil";
 
 const PHONE_PREFIXES = ["0412", "0414", "0416", "0424", "0426"] as const;
-const DNI_PREFIXES = ["V", "J", "G"] as const;
+const DNI_PREFIXES = ["V", "J", "G", "E"] as const;
 
 const schema = z.object({
   bank: z.string().min(1, "Selecciona un banco"),

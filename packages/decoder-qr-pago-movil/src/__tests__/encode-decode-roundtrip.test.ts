@@ -76,6 +76,12 @@ describe("encodeQr + decodeQr round-trip", () => {
     expect(decoded.dni).toBe("J12345678");
   });
 
+  it("prefix E se respeta", () => {
+    const data = { dni: "12345678", phone: "584120000000", bank: "0102" as const, prefix: "E" };
+    const decoded = decodeQr(encodeQr(data));
+    expect(decoded.dni).toBe("E12345678");
+  });
+
   it("prefix inválido lanza error", () => {
     const data = { dni: "12345678", phone: "584120000000", bank: "0114" as const, prefix: "X" };
     expect(() => encodeQr(data)).toThrow("Prefijo de DNI no admitido");
